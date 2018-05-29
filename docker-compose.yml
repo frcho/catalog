@@ -1,0 +1,37 @@
+version: '2.3'
+
+services:
+
+    catalog-php:
+        image: php:7.1
+        environment:
+            APP_ENV: prod
+        networks:
+            catalog:
+                aliases:
+                    - php
+            store:
+                aliases:
+                    - catalog-php
+
+    catalog-nginx:
+        build: 
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+        networks:
+            catalog:
+                aliases:
+                    - nginx
+            store:
+                aliases:
+                    - catalog
+        labels:
+            - 'traefik.enable=true'
+            - 'traefik.frontend.rule=Host:catalog.dev.localhost'
+            - 'traefik.network=store'
+
+networks:
+    store:
+        external:
+            name: store
+    catalog: ~
